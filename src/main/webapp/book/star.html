@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+<title>Home</title>
+</head>
+<body class="lift:content_id=main">
+<div id="main" data-lift="surround?with=default;at=content">
+    
+    <section data-lift="BookSnippet">
+    	<header><h2><span name="bookName"></span></h2></header>
+    	<p><span name="bookContent"></span></p>    	
+    </section>
+    
+    <section data-lift="BookSnippet.prepareComet">
+    	<header><h2>Book Comments</h2></header>
+    	<div id="messages">
+    		<ul>
+    			<li><span name="msg"></span></li>
+    		</ul>
+    	</div>
+    </section>    
+
+	<section data-lift="form.ajax">
+		<header><h2>Write a comment</h2></header>
+		<div data-lift="BookSnippet.postSection">
+			<input id="new" type="text"></input>
+			<button name="postButton" class="large button">Post your comment</button>
+		</div>
+	</section>
+
+    <script type="text/javascript">
+
+        function partialUpdate(message) {
+            console.log("incoming message = " + message + ". Start creating new list entry...")
+            var messages = $("#messages");
+            var list = messages.children("ul");
+            // simply check the length. If != 0 --> true else false
+            if (list.length) {
+                console.log("found ul element. Simply create a li element with the new message")
+                list.prepend("<li>" + message + "</li>");
+            } else {
+                console.log("found NO ul element. Clean up existing html inside the messages element and add the " +
+                    "list with the first entry")
+                messages.html("");
+                messages.append("<ul><li>" + message + "</li></ul>")
+            }
+        }
+
+    </script>
+
+</div>      
+</body>
+</html>
+
