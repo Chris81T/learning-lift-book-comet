@@ -23,7 +23,7 @@ object KnockoutServer extends LiftActor with ListenerManager {
    */
   def createUpdate = HelloKnockoutActor("registered at server --> timestamp = " + new DateTime().toDate.toString)
 
-  override def messageHandler = {
+  override def lowPriority = {
     case msg: KnockoutMessage =>
       println("KO SERVER >> incoming knockout message send to all known listeners...")
       updateListeners(msg)

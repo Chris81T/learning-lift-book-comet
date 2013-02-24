@@ -51,6 +51,8 @@ class KnockoutActor extends CometActor with CometListener {
           println("KO ACTOR >> >> Okay, this actor = " + toString + " has to handle the incoming message. So do it and prepare some " +
             "knockoutJS operations : )")
           // TODO partialUpdate(JE.Call("partialUpdate", message).cmd)
+        } else {
+          println("KO ACTOR >> >> Incoming message is not for this actor = " + toString)
         }
       case _ => println("KO ACTOR >> >> No book registered in this actor = " + toString + ". Do nothing with incoming message!")
     }
