@@ -46,10 +46,33 @@
                 messages.append("<ul><li>" + message + "</li></ul>")
             }
         }
-
     </script>
 
-</div>      
+    <!-- THE KNOCKOUT-JS PART STARTS HERE :: -->
+
+    <section class="panel">
+        <header><h2>Messages handled by KnockoutJS</h2></header>
+
+        <section data-lift="BookSnippet.setupKnockoutComet">
+            <header><h3>List all more complex messages</h3></header>
+            <div id="ko-messages">
+                <ul></ul>
+            </div>
+        </section>
+
+        <section data-lift="form.ajax">
+            <header><h2>Write a *knockout* message</h2></header>
+            <div data-lift="BookSnippet.postKnockoutMessage">
+                <label>Message: <input id="newMsg" type="text"></input></label>
+                <label>Username: </label><input id="username" type="text"></input></label>
+                <button name="postButton" class="large button">Post your message</button>
+            </div>
+        </section>
+
+    </section>
+
+
+</div>
 </body>
 </html>
 

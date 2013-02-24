@@ -1,8 +1,13 @@
 package code.model
 
+import org.joda.time.DateTime
+
 case class Book(name: String, content: String, id: String)
 
 case class History(message: String, book: Book, id: String)
+case class ComplexHistory(message: String, username: String, book: Book, id: String) {
+  val timestamp = new DateTime
+}
 
 /**
  * Mockup for some backend storage like a database...
@@ -17,8 +22,10 @@ object BookStorage {
     Nil
 
   var history: List[History] = Nil
+  var complexHistory: List[ComplexHistory] = Nil
 
   def historyEntriesFor(book: Book): List[History] = history.filter(_.book.equals(book))
+  def complexHistoryEntriesFor(book: Book): List[ComplexHistory] = complexHistory.filter(_.book.equals(book))
 
   def getBook(id: String): Book = books.filter(_.id.equals(id)).first
 
@@ -28,5 +35,17 @@ object BookStorage {
       " for according to book = " +
       book)
     history ::= History(message, book, history.size.toString)
+  }
+
+  def createComplexHistory(message: String, username: String, book: Book) : ComplexHistory = {
+    println("create new complex-history with given message = " +
+      message +
+      " of user with name = " +
+      username +
+      " for book according to = " +
+      book)
+    val entry = ComplexHistory(message, username, book, complexHistory.size.toString)
+    complexHistory ::= entry
+    entry
   }
 }
