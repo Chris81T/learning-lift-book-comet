@@ -6,12 +6,16 @@
 </head>
 <body class="lift:content_id=main">
 <div id="main" data-lift="surround?with=default;at=content">
-    
+
+    <!-- Include the latest knockoutjs version -->
+    <script data-lift="head" id="knockout" src="/js/knockout/knockout-2.2.1.js" type="text/javascript"></script>
+
     <section data-lift="BookSnippet">
-    	<header><h2><span name="bookName"></span></h2></header>
+    	<header class="callout panel"><h2><span name="bookName"></span></h2></header>
     	<p><span name="bookContent"></span></p>    	
     </section>
-    
+
+<!-- FIRST ALSO WORKING VERSION OF THIS EXAMPLE
     <section data-lift="BookSnippet.prepareComet">
     	<header><h2>Book Comments</h2></header>
     	<div id="messages">
@@ -35,7 +39,7 @@
             console.log("incoming message = " + message + ". Start creating new list entry...")
             var messages = $("#messages");
             var list = messages.children("ul");
-            // simply check the length. If != 0 --> true else false
+            // simply check the length. If != 0 -> true else false
             if (list.length) {
                 console.log("found ul element. Simply create a li element with the new message")
                 list.prepend("<li>" + message + "</li>");
@@ -47,18 +51,11 @@
             }
         }
     </script>
+-->
 
     <!-- THE KNOCKOUT-JS PART STARTS HERE :: -->
 
     <section class="panel">
-        <header><h2>Messages handled by KnockoutJS</h2></header>
-
-        <section data-lift="BookSnippet.setupKnockoutComet">
-            <header><h3>List all more complex messages</h3></header>
-            <div id="ko-messages">
-                <ul></ul>
-            </div>
-        </section>
 
         <section data-lift="form.ajax">
             <header><h2>Write a *knockout* message</h2></header>
@@ -69,8 +66,80 @@
             </div>
         </section>
 
+        <header><h2>Messages handled by KnockoutJS</h2></header>
+        <section data-lift="BookSnippet.setupKnockoutComet">
+            <header><h3>List all more complex messages</h3></header>
+            <div id="ko-messages">
+                <div data-bind="template: {name: getTemplate, foreach: histories}"></div>
+                <span data-bind="visible: histories().length == 0">No messages available. Be the first one, who is creating a new message</span>
+            </div>
+        </section>
+
     </section>
 
+    <!-- template one for messages with a length <= 20 characters -->
+    <script type="text/html" id="history-template-normal">
+        <div class="panel" style="padding-top: 0px; background-color: #FFFFFF;">
+            <div class="row">
+                <h3><small data-bind="text: message"></small></h3>
+            </div>
+            <div class="row">
+                User: <span class="radius alert label" data-bind="text: username"></span> -
+                <span class="radius success label" data-bind="text: timestamp"></span>
+            </div>
+        </div>
+    </script>
+
+    <!-- template two for messages with a length > 20 characters -->
+    <script type="text/html" id="history-template-big">
+        <div class="panel" style="padding-top: 0px; background-color: #d4F694;">
+            <div class="row">
+                <h3><small data-bind="text: message"></small></h3>
+            </div>
+            <div class="row">
+                User: <span class="radius alert label" data-bind="text: username"></span> -
+                <span class="radius success label" data-bind="text: timestamp"></span> - more
+                than 20 character's
+            </div>
+        </div>
+    </script>
+
+    <script type="text/javascript">
+        function HistoryMessage(json) {
+            this.message = ko.observable(json.message);
+            this.username = ko.observable(json.username);
+            this.timestamp = ko.observable(json.timestamp);
+        }
+
+        function HistoryMessagesModel() {
+            // fields:
+            var self = this;
+            self.histories = ko.observableArray([]);
+
+            // operations:
+            initHistories = function(jsonArray) {
+                console.log("initialize history-message-model with given histories");
+                var mappedHistories = $.map(jsonArray, function(json) {return new HistoryMessage(json)});
+                self.histories(mappedHistories);
+            }
+
+            addHistory = function(json) {
+                console.log("add new history message to history-message-model");
+                self.histories.unshift(new HistoryMessage(json)); // prepend incoming json history message | push == append
+            }
+
+            getTemplate = function(historyMessage) {
+                var message = historyMessage.message();
+                console.log("get template for given history-message - message = " + message);
+                return message.length <= 20 ?
+                        "history-template-normal" :
+                        "history-template-big";
+            }
+        }
+
+        // create and register the custom model with knockoutJS
+        ko.applyBindings(new HistoryMessagesModel());
+    </script>
 
 </div>
 </body>

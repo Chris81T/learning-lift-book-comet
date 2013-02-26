@@ -6,6 +6,8 @@ import common._
 
 import code.model._
 import js.JE
+import json.JsonAST.{JArray, JObject}
+import json.JsonDSL._
 
 class KnockoutActor extends CometActor with CometListener {
 
@@ -21,6 +23,20 @@ class KnockoutActor extends CometActor with CometListener {
     case HelloKnockoutActor(message) => println("KO ACTOR >> >> >> received welcome message from KNOCKOUT-SERVER = " + message)
   }
 
+  private def generateJSON(history: ComplexHistory) : JObject = {
+    val json = (
+        ("message" -> history.message) ~
+        ("username" -> history.username) ~
+        ("timestamp" -> history.timestamp.toDate.toString)
+    )
+
+    println("create for given history = " +
+      history +
+      " an appropriate JSON object = " +
+      json)
+
+    json
+  }
   private def setupIncomingBook(incomingBook: Book) {
     println("KO ACTOR >> >> incoming book " +
       incomingBook +
@@ -30,10 +46,12 @@ class KnockoutActor extends CometActor with CometListener {
     book = Full(incomingBook)
 
     /*
-     * re-render the complete content while originally the render method is
-     * called before this method (see logs)
+     * get all appropriate history messages, create JSON objects and send them to the client, so the knockoutJS will
+     * do the rest
      */
-    reRender()
+    val histories = BookStorage.complexHistoryEntriesFor(incomingBook)
+    val historiesJSONArray = for (history <- histories) yield generateJSON(history)
+    partialUpdate(JE.Call("initHistories", JArray(historiesJSONArray)).cmd)
   }
 
   private def handleIncomingMessage(history: ComplexHistory, book: Book) {
@@ -50,7 +68,7 @@ class KnockoutActor extends CometActor with CometListener {
         if (knownBook.equals(book)) {
           println("KO ACTOR >> >> Okay, this actor = " + toString + " has to handle the incoming message. So do it and prepare some " +
             "knockoutJS operations : )")
-          // TODO partialUpdate(JE.Call("partialUpdate", message).cmd)
+          partialUpdate(JE.Call("addHistory", generateJSON(history)).cmd)
         } else {
           println("KO ACTOR >> >> Incoming message is not for this actor = " + toString)
         }
@@ -60,11 +78,8 @@ class KnockoutActor extends CometActor with CometListener {
   }
 
   def render = {
-    println("KO ACTOR >> >> Start to initially render all existing messages for given book = " + book)
-    book match {
-      case Full(book) =>
-        "*" #> ""
-      case _ => "ul" #> "No book is known by the knockout-actor"
-    }
+    // TODO how to ignore it instead of using a fake-id ?!
+    println("KO ACTOR >> >> RENDERING IS NOT REQUIRED !!!")
+    "fake" #> ""
   }
 }

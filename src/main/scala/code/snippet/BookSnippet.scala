@@ -48,6 +48,7 @@ class BookSnippet(book: Book) {
       if (!newMessage.isEmpty) {
         BookStorage.createHistory(newMessage, book)
         HistoryServer ! IncomingMessage(newMessage, book)
+        newMessage = ""
         SetValById("new", "")
       } else {
         println("While empty message exsists, do nothing")
@@ -90,6 +91,8 @@ class BookSnippet(book: Book) {
       if (!newMessage.isEmpty && !username.isEmpty) {
         val result = BookStorage.createComplexHistory(newMessage, username, book)
         KnockoutServer ! KnockoutMessage(result, book)
+        newMessage = ""
+        username = ""
         SetValById("newMsg", "") & SetValById("username", "")
       } else {
         println("Eighter message or username or both fields are empty. Correct it!")
